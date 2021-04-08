@@ -10,15 +10,18 @@ Within the [Dockerfile](./Dockerfile) the environment variable for the OPENSHIFT
 
 #### Build the container image
 
+*Change the <quay-username> to your quay.io username*
+
 ```sh 
-podman build . -t ocp4-auto-approve-csr:4.7.5
+podman build -t quay.io/<quay-username>/ocp4-auto-approve-csr:4.7.5 .
 ```
 
 #### Push the container image
 
 *Change the <quay-username> to your quay.io username*
+
 ```sh
-podman push localhost/ocp4-auto-approve-csr:4.7.5 quay.io/<quay-username>/ocp4-auto-approve-csr:4.7.5
+podman push quay.io/<quay-username>/ocp4-auto-approve-csr:4.7.5
 ```
 
 ## Deploy the cron-job onto Openshift 4.x
