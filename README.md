@@ -10,7 +10,7 @@ Within the [Dockerfile](./Dockerfile) the environment variable for the OPENSHIFT
 
 #### Build the container image
 
-*Change the <quay-username> to your quay.io username*
+*Change the < quay-username > to your quay.io username*
 
 ```sh 
 podman build -t quay.io/<quay-username>/ocp4-auto-approve-csr:4.7.5 .
@@ -18,7 +18,7 @@ podman build -t quay.io/<quay-username>/ocp4-auto-approve-csr:4.7.5 .
 
 #### Push the container image
 
-*Change the <quay-username> to your quay.io username*
+*Change the < quay-username > to your quay.io username*
 
 ```sh
 podman push quay.io/<quay-username>/ocp4-auto-approve-csr:4.7.5
@@ -60,7 +60,9 @@ spec:
 oc create -f ocp4-auto-approve-csr.yml
 ```
 
-### Confirm it's all set
+## Review and confirm
+
+#### Confirm it's all set
 
 *You may confirm that there is a CronJob created within the new project by running the following command*  
 
@@ -72,3 +74,24 @@ oc create -f ocp4-auto-approve-csr.yml
 NAME                    SCHEDULE   SUSPEND   ACTIVE   LAST SCHEDULE   AGE
 ocp4-auto-approve-csr   @hourly    False     0        <none>          93s
 ```
+
+#### Review the CronJob output
+
+*You may review the output of every CronJob within the namespace to confirm if any CSR were approved*
+
+```sh
+oc get pods -n openshift-cron-jobs
+```
+
+Output similar to this:
+> NAME                                     READY   STATUS      RESTARTS   AGE
+> ocp4-auto-approve-csr-1617897600-mftxq   0/1     Completed   0          125m
+> ocp4-auto-approve-csr-1617901200-f9hbp   0/1     Completed   0          65m
+> ocp4-auto-approve-csr-1617904800-jklwh   0/1     Completed   0          5m40s
+
+oc logs < Pod name > -n openshift-cron-jobs
+
+Output similar to this:
+> Logged into "https://172.30.0.1:443" as "system:serviceaccount:openshift-cron-jobs:default" using the token provided.
+> ...
+> No CSRs found, nothing to do!
