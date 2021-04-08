@@ -6,7 +6,7 @@ This repo is to be used with caution and mainly will help any UPI of Openshift 4
 
 ## Create the container image that performs the auto-approval
 
-Within the [Dockerfile](./Dockerfile) the environment variable for the OPENSHIFT_VERSION is set to 4.7.5, we will be alligning our tag to reference the same.  
+Within the [Dockerfile](./Dockerfile) the environment variable for the OPENSHIFT_VERSION is set to 4.7.5, we will be aligning our tag to reference the same.  
 
 #### Build the container image
 
