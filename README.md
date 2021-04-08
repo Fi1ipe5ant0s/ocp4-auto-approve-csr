@@ -83,15 +83,22 @@ ocp4-auto-approve-csr   @hourly    False     0        <none>          93s
 oc get pods -n openshift-cron-jobs
 ```
 
-Output similar to this:
-> NAME                                     READY   STATUS      RESTARTS   AGE
-> ocp4-auto-approve-csr-1617897600-mftxq   0/1     Completed   0          125m
-> ocp4-auto-approve-csr-1617901200-f9hbp   0/1     Completed   0          65m
-> ocp4-auto-approve-csr-1617904800-jklwh   0/1     Completed   0          5m40s
+Output similar to this:  
 
-oc logs < Pod name > -n openshift-cron-jobs
+```sh
+NAME                                     READY   STATUS      RESTARTS   AGE
+ocp4-auto-approve-csr-1617897600-mftxq   0/1     Completed   0          125m
+ocp4-auto-approve-csr-1617901200-f9hbp   0/1     Completed   0          65m
+ocp4-auto-approve-csr-1617904800-jklwh   0/1     Completed   0          5m40s
+```
 
-Output similar to this:
-> Logged into "https://172.30.0.1:443" as "system:serviceaccount:openshift-cron-jobs:default" using the token provided.
-> ...
-> No CSRs found, nothing to do!
+*Review the Logs*  
+`oc logs < Pod name > -n openshift-cron-jobs`
+
+Output similar to this:  
+
+```sh
+Logged into "https://172.30.0.1:443" as "system:serviceaccount:openshift-cron-jobs:default" using the token provided.
+...
+No CSRs found, nothing to do!
+```
