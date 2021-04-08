@@ -29,7 +29,7 @@ podman push quay.io/<quay-username>/ocp4-auto-approve-csr:4.7.5
 #### Create a new openshift project
 
 ```sh 
-oc new-project openshift-cron-jobs
+oc adm new-project openshift-cron-jobs
 ```
 
 #### Update the ServiceAccount role
@@ -58,4 +58,17 @@ spec:
 
 ```sh
 oc create -f ocp4-auto-approve-csr.yml
+```
+
+### Confirm it's all set
+
+*You may confirm that there is a CronJob created within the new project by running the following command*  
+
+`oc get CronJob -n openshift-cron-jobs` 
+
+*The output should be similar to the following:*  
+
+```sh
+NAME                    SCHEDULE   SUSPEND   ACTIVE   LAST SCHEDULE   AGE
+ocp4-auto-approve-csr   @hourly    False     0        <none>          93s
 ```
