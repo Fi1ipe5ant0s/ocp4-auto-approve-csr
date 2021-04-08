@@ -75,7 +75,7 @@ NAME                    SCHEDULE   SUSPEND   ACTIVE   LAST SCHEDULE   AGE
 ocp4-auto-approve-csr   @hourly    False     0        <none>          93s
 ```
 
-#### Review the CronJob ouput
+#### Review the CronJob output
 
 *You may review the output of every CronJob within the namespace to confirm if any CSR were approved*
 
