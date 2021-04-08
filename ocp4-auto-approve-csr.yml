@@ -13,7 +13,7 @@ spec:
         spec:
           containers:
             - name: openshift-client
-              image: 'quay.io/vchintal/ocp4-auto-approve-csr:4.1.18'
+              image: 'quay.io/<quay-username>/ocp4-auto-approve-csr:4.7.5'
               args:
                 - /bin/sh
                 - '-c'
