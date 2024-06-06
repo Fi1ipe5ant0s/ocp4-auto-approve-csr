@@ -1,26 +1,75 @@
-kind: CronJob
-apiVersion: batch/v1beta1
+apiVersion: project.openshift.io/v1
+kind: Project
 metadata:
-  name: ocp4-auto-approve-csr
-  namespace: openshift-cron-jobs
+  labels:
+    kubernetes.io/metadata.name: openshift-csr-approve
+  name: openshift-csr-approve
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: csr-sa
+  namespace: openshift-csr-approve
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: openshift-csr-approve
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin
+subjects:
+- kind: ServiceAccount
+  name: csr-sa
+  namespace: openshift-csr-approve
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: ocp4-aprove-csr
+  namespace: openshift-csr-approve
+data:
+  csr-approve.sh: |
+    #!/bin/sh 
+    export KUBECONFIG=/tmp/.kube/config
+    oc login --token=`cat /var/run/secrets/kubernetes.io/serviceaccount/token` https://$KUBERNETES_SERVICE_HOST:$KUBERNETES_SERVICE_PORT --insecure-skip-tls-verify
+    oc get csr -ojson | jq -r '.items[] | select(.status == {} ) | .metadata.name' > /tmp/csrs
+    LINECOUNT=`wc -l /tmp/csrs | awk '{print $1}'`
+    if [ $LINECOUNT -gt 0 ]; then
+        cat /tmp/csrs | xargs oc adm certificate approve
+    else
+        echo "No CSRs found, nothing to do!"
+    fi
+---
+kind: CronJob
+apiVersion: batch/v1
+metadata:
+  name: ocp4-aprove-csr
+  namespace: openshift-csr-approve
 spec:
-  schedule: '@hourly'
+  schedule: '@daily'
   concurrencyPolicy: Allow
   suspend: false
   jobTemplate:
     spec:
       template:
         spec:
+          serviceAccount: csr-sa
+          serviceAccountName: csr-sa
+          volumes:
+          - name: script
+            configMap:
+              name: ocp4-aprove-csr
           containers:
-            - name: openshift-client
-              image: 'quay.io/<quay-username>/ocp4-auto-approve-csr:4.7.5'
-              args:
-                - /bin/sh
-                - '-c'
-                - ./startup.sh
-              resources: {}
-              terminationMessagePath: /dev/termination-log
-              terminationMessagePolicy: File
+            - name: csr-approve
+              image: registry.redhat.io/openshift4/ose-cli:latest
+              volumeMounts:
+                - name: script
+                  mountPath: /usr/csr-approve
+              command:
+              - /bin/sh
+              - /usr/csr-approve/csr-approve.sh
               imagePullPolicy: IfNotPresent
           restartPolicy: OnFailure
           terminationGracePeriodSeconds: 30
