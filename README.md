@@ -1,23 +1,24 @@
 # Auto-approve Openshift 4 CSRs
 
-This repo is to be used with caution and mainly will help ensuring certificiates request within Openshift are no lomnger in Pending state and are approved.  
+This repo is to be used with caution and mainly will help ensuring certificiates request within Openshift are no longer in Pending state and are approved.  
 
 ## Additional information  
 The manifest **[ocp4-auto-approve-csr](./ocp4-auto-approve-csr.yml)**, will create the following:  
 - 1 Project called: *openshift-csr-approve*  
 - 1 Service Account called: *csr-sa*  
 - 1 RoleBinding called: openshift-csr-approve  
+- 1 ClusterRole called: approve-csr
 - 1 ConfigMap called: *ocp4-aprove-csr*  
 - 1 CronJob called: *ocp4-aprove-csr*  
 
 ## Deploy the cron-job onto Openshift 4.x
 
 #### Update the CronJob schedule
-*You may also replace the cron schedule, to better suit your needs or requirements. The default values are set to CSRs getting approved every hour.*  
+*You may also replace the cron schedule, to better suit your needs or requirements. The default values are set to CSRs getting approved every day.*  
 
 ```sh
 spec:
-  schedule: '@hourly'
+  schedule: '@daily'
 ```
 #### Create the CronJob entry
 
@@ -39,7 +40,7 @@ oc create -f ocp4-auto-approve-csr.yml
 
 ```sh
 NAME                    SCHEDULE   SUSPEND   ACTIVE   LAST SCHEDULE   AGE
-ocp4-auto-approve-csr   @hourly    False     0        <none>          93s
+ocp4-auto-approve-csr   @daily    False     0        <none>          93s
 ```
 
 #### Review the CronJob output

@@ -12,13 +12,31 @@ metadata:
   namespace: openshift-csr-approve
 ---
 apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: approve-csr
+rules:
+- apiGroups:
+  - certificates.k8s.io
+  resources:
+  - certificatesigningrequests
+  verbs:
+  - get
+  - list
+  - create
+  - update
+  - delete
+  - deletecollection
+  - watch
+---
+apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   name: openshift-csr-approve
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: cluster-admin
+  name: approve-csr
 subjects:
 - kind: ServiceAccount
   name: csr-sa
@@ -34,10 +52,10 @@ data:
     #!/bin/sh 
     export KUBECONFIG=/tmp/.kube/config
     oc login --token=`cat /var/run/secrets/kubernetes.io/serviceaccount/token` https://$KUBERNETES_SERVICE_HOST:$KUBERNETES_SERVICE_PORT --insecure-skip-tls-verify
-    oc get csr -ojson | jq -r '.items[] | select(.status == {} ) | .metadata.name' > /tmp/csrs
-    LINECOUNT=`wc -l /tmp/csrs | awk '{print $1}'`
+    oc get csr -o go-template='{{range .items}}{{if not .status}}{{.metadata.name}}{{"\n"}}{{end}}{{end}}' > /tmp/csr_list
+    LINECOUNT=`wc -l /tmp/csr_list | awk '{print $1}'`
     if [ $LINECOUNT -gt 0 ]; then
-        cat /tmp/csrs | xargs oc adm certificate approve
+        cat /tmp/csr_list | xargs oc adm certificate approve
     else
         echo "No CSRs found, nothing to do!"
     fi
